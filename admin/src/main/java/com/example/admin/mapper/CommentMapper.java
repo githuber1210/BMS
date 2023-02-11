@@ -10,10 +10,9 @@ import java.util.List;
 
 public interface CommentMapper extends BaseMapper<Comment> {
 
-    @Select("select comment.*,user.username,user.avatar " +
-            "from comment left join user on comment.uid = user.id " +
-            "where comment.bid = #{blogId} " +
-            "order by id desc")
-    List<Comment> findCommentDetail(@Param("blogId") Integer blogId);
+    @Select("select c.*,u.username,u.avatar " +
+            "from sys_notice_comment c left join sys_user u on c.uid = u.id " +
+            "where c.bid = #{noticeId}")
+    List<Comment> findCommentDetail(@Param("noticeId") Integer noticeId);
 
 }

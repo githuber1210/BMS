@@ -1,0 +1,30 @@
+server:
+      port: 9999
+
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  mvc:
+    pathmatch:
+      matching-strategy:
+        ANT_PATH_MATCHER
+  mail:
+    host: smtp.qq.com
+    username: 3353115002@qq.com
+    password: pcrraouqwpotcjge
+    default-encoding: UTF-8
+
+
+#profiles:
+#  active: dev
+

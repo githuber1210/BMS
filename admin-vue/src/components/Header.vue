@@ -9,11 +9,10 @@
     </div>
     <el-dropdown>
       <div>
-        <img :src="user.avatar" style="width: 40px;  position: relative; top: 10px;">
         <span>{{ user.username }}</span><i class="el-icon-arrow-down el-icon--right"></i>
       </div>
       <el-dropdown-menu slot="dropdown" >
-        <el-dropdown-item ><router-link to="/person" style="text-decoration: none"  >个人信息</router-link> </el-dropdown-item>
+        <el-dropdown-item ><router-link to="/person" style="text-decoration: none">个人信息</router-link> </el-dropdown-item>
         <el-dropdown-item><b @click="logout">登出系统</b></el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -36,7 +35,6 @@ export default {
   },
   data() {
     return {
-
     }
   },
   methods: {
@@ -45,11 +43,15 @@ export default {
       this.$emit("asideCollapse")
     },
     logout() {
-      localStorage.removeItem("user")
-      localStorage.removeItem("menus")
-      router.push("/login")
+      this.request.delete("/logout/" + this.user.token).then(res =>{
+        if(res.code == 200){
+          localStorage.removeItem("user")
+          localStorage.removeItem("menus")
+          router.push("/login")
+          this.$message.success("登出系统成功!")
+        }
+      })
     },
-
   }
 }
 </script>

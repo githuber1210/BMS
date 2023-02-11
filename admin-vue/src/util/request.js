@@ -1,8 +1,8 @@
 import axios from 'axios'
 import router from "@/router";
-
+import {serverIp} from "../../public/config";
 const request = axios.create({
-    baseURL: 'http://localhost:9999',
+    baseURL: 'http://' + serverIp + ':9999',
     timeout: 30000
 })
 
@@ -39,7 +39,7 @@ request.interceptors.response.use(
                 message: res.msg,
                 type: 'error'
             });
-            // router.push("/login")
+             router.push("/login")
         }
         return res;
     },

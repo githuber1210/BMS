@@ -2,11 +2,14 @@
  <div>
       <el-input style="width: 200px" placeholder="文件名称" v-model="fileName"></el-input>
       <el-button icon="el-icon-search"  @click="load"></el-button>
-      <el-upload  :action="serverIp + '/file/upload'" :show-file-list="false"
-                 :on-success="handleFileUploadSuccess" style="display: inline-block;margin-left:10px">
+      <el-upload  :action="'http://' + serverIp + ':9999/file/upload'"
+                  :show-file-list="false"
+                  :on-success="handleFileUploadSuccess"
+                  style="display: inline-block;margin-left:10px">
           <el-button icon="el-icon-plus" ></el-button>
        </el-upload>    
         <el-popconfirm
+          style="margin-left: 10px"
           confirm-button-text='确定'
           cancel-button-text='取消'
           icon="el-icon-info"
@@ -17,26 +20,34 @@
         <el-button type="danger" slot="reference" icon="el-icon-delete"></el-button>
       </el-popconfirm>
 
-      <el-table :data="tableData"  stripe @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55"></el-table-column>
-      <el-table-column prop="id" label="ID" width="80"></el-table-column>
-      <el-table-column prop="name" label="文件名称" width="300px"></el-table-column>
-      <el-table-column prop="fileSize" label="文件大小"></el-table-column>
-      <el-table-column label="下载">
-        <template slot-scope="scope">
-          <el-button icon="el-icon-download" circle @click="download(scope.row.fileUrl)"></el-button>
-        </template>
-      </el-table-column>
+        <el-table :data="tableData"  stripe @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column prop="name" label="文件名称" width="150"></el-table-column>
+        <el-table-column prop="size" label="文件大小"></el-table-column>
+        <el-table-column prop="type" label="文件类型"></el-table-column>
+        <el-table-column prop="time" label="文件上传时间" width="200"></el-table-column>
+        <el-table-column prop="url" label="文件路径" width="450"></el-table-column>
 
-     
-    </el-table>
+        <el-table-column label="下载" width="80px">
+          <template slot-scope="scope">
+            <el-button icon="el-icon-download" circle @click="download(scope.row.url)"></el-button>
+          </template>
+        </el-table-column>
 
-    <div style="padding: 10px 0">
+        <el-table-column label="预览" width="80px">
+          <template slot-scope="scope">
+            <el-button icon="el-icon-search" circle  @click="preview(scope.row.url)" disabled></el-button>
+          </template>
+        </el-table-column>
+
+      </el-table>
+
+    <div style="padding: 30px 0;text-align: center">
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="pageNum"
-          :page-sizes="[4,8]"
+          :page-sizes="[5,10,20]"
           :page-size="pageSize"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
@@ -46,22 +57,24 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
 
 export default {
   name: "File",
   data() {
     return {
-      serverIp: 'http://localhost:9999',
+      serverIp: serverIp,
       tableData: [],
       fileName: '',
       multipleSelection: [],
       pageNum: 1,
-      pageSize: 8,
+      pageSize: 10,
       total: 0
     }
   },
   created() {
     this.load()
+
   },
   methods: {
     load() {
@@ -69,21 +82,11 @@ export default {
         params: {
           pageNum: this.pageNum,
           pageSize: this.pageSize,
-          fileName: this.fileName,
+          name: this.name,
         }
       }).then(res => {
         this.tableData = res.data.records
         this.total = res.data.total
-      })
-    },
-    del(id) {
-      this.request.delete("/file/" + id).then(res => {
-        if (res.code === 200) {
-          this.$message.success("删除成功")
-          this.load()
-        } else {
-          this.$message.error(res.msg)
-        }
       })
     },
     handleSelectionChange(val) {
@@ -116,6 +119,9 @@ export default {
     download(url) {
       window.open(url)
     },
+    preview(url){
+      window.open('https://file.keking.cn/onlinePreview?url=' + encodeURIComponent(window.btoa((url))))
+    }
 
   }
 }

@@ -9,9 +9,9 @@ import org.apache.ibatis.annotations.Update;
 
 public interface UserMapper extends BaseMapper<User> {
 
-    @Update("update user set password = #{newPassword} where username = #{username} and password = #{password}")
+    @Update("update sys_user set password = #{newPassword} where username = #{username} and password = #{password}")
     int updatePassword(Password password);
-    @Select("select * from user where username = #{username}")
+    @Select("select * from sys_user where username = #{username}")
     User findByUsername(String username);
 
 }

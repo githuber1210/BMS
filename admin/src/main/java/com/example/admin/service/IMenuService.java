@@ -10,4 +10,8 @@ public interface IMenuService extends IService<Menu> {
 
 
     List<Menu> listAllMenus();
+
+    void saveMenu(Menu menu);
+
+    void updateMenu(Menu menu);
 }

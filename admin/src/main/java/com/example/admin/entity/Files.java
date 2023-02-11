@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 @Data
-@TableName("files")
+@TableName("sys_files")
 public class Files {
     @TableId(value = "id",type= IdType.AUTO)
     private Integer id;
     private String name;
-    private String fileType;
-    private long fileSize;
-    private String fileUrl;
+    private String type;
+    private long size;
+    private String url;
+    private String time;
+    private String updateBy;
+
 
 }

@@ -2,12 +2,12 @@ package com.example.admin.controller;
 
 
 import cn.hutool.core.date.DateUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.admin.config.Result.Result;
+import com.example.admin.common.Result.Result;
 import com.example.admin.entity.Comment;
 import com.example.admin.service.ICommentService;
 import com.example.admin.util.TokenUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
+@Api(tags = "通告评论模块")
 @RestController
 @RequestMapping("/comment")
 public class CommentController {
@@ -23,8 +23,23 @@ public class CommentController {
     @Resource
     private ICommentService commentService;
 
+    @ApiOperation("列出所有评论")
+    @GetMapping
+    public Result list() {
+        List<Comment> commentList = commentService.list();
+        return Result.success(commentList);
+    }
+
+    @ApiOperation("删除评论")
+    @DeleteMapping("/{id}")
+    public Result removeById(@PathVariable Integer id) {
+        commentService.removeById(id);
+        return Result.success();
+    }
+
+    @ApiOperation("添加评论")
     @PostMapping
-    public Result saveOrUpdate(@RequestBody Comment comment) {
+    public Result save(@RequestBody Comment comment) {
         if (comment.getId() == null) {
             comment.setUid(TokenUtils.getCurrentUser().getId());
             comment.setTime(DateUtil.now());
@@ -38,31 +53,14 @@ public class CommentController {
                 }
             }
         }
-        commentService.saveOrUpdate(comment);
+        commentService.save(comment);
         return Result.success();
     }
 
-    @DeleteMapping("/{id}")
-    public Result removeById(@PathVariable Integer id) {
-        commentService.removeById(id);
-        return Result.success();
-    }
-
-    @PostMapping("/del/batch")
-    public Result removeByIds(@RequestBody List<Integer> ids) {
-        commentService.removeByIds(ids);
-        return Result.success();
-    }
-
-
-    @GetMapping
-    public Result list() {
-        return Result.success(commentService.list());
-    }
-
-    @GetMapping("/tree/{blogId}")
-    public Result listTree(@PathVariable Integer blogId) {
-        List<Comment> commentList = commentService.findCommentDetail(blogId);
+    @ApiOperation("获取评论树结构")
+    @GetMapping("/tree/{noticeId}")
+    public Result listTree(@PathVariable Integer noticeId) {
+        List<Comment> commentList = commentService.findCommentDetail(noticeId);
         List<Comment> originList = commentList.stream()
                 .filter(comment -> comment.getPpid() == null)
                 .collect(Collectors.toList());
@@ -85,19 +83,6 @@ public class CommentController {
             origin.setChildren(comments);
         }
         return Result.success(originList);
-    }
-
-    @GetMapping("/{id}")
-    public Result getById(@PathVariable Integer id) {
-        return Result.success(commentService.getById(id));
-    }
-
-    @GetMapping("/page")
-    public Result page(@RequestParam Integer pageNum,
-                           @RequestParam Integer pageSize) {
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.orderByDesc("id");
-        return Result.success(commentService.page(new Page<>(pageNum, pageSize), queryWrapper));
     }
 
 }

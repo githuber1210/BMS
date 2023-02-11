@@ -17,7 +17,7 @@
         <el-button type="danger" slot="reference"><i class="el-icon-delete"></i></el-button>
       </el-popconfirm>
       <el-upload
-                 :action="'http://localhost:9999/user/import'"
+                 :action="'http://' + serverIp + ':9999/user/import'"
                  :show-file-list="false"
                  accept="xlsx"
                  :on-success="handleExcelImportSuccess"
@@ -27,11 +27,15 @@
       <el-button type="primary" @click="excelExport" style="margin-left:10px">Excel 导出</el-button>
 
     <el-table :data="tableData"  stripe   @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="50"></el-table-column>
-      <el-table-column prop="username" label="用户名"></el-table-column>
-      <el-table-column prop="role" label="角色"></el-table-column>
-      <el-table-column prop="telephone" label="电话号码"></el-table-column>
+      <el-table-column type="selection"></el-table-column>
+      <el-table-column prop="username" label="用户名"  width="100"></el-table-column>
+      <el-table-column prop="role" label="角色"  width="120"></el-table-column>
+      <el-table-column prop="sex" label="性别"  width="80"></el-table-column>
+      <el-table-column prop="telephone" label="电话号码" width="100"></el-table-column>
+      <el-table-column prop="email" label="邮箱地址"></el-table-column>
       <el-table-column prop="createTime" label="注册/创建时间"></el-table-column>
+      <el-table-column prop="loginTime" label="最后登录时间"></el-table-column>、
+
       <el-table-column >
         <template slot-scope="scope">
           <el-button type="primary" icon="el-icon-edit"  circle @click="edit(scope.row)" ></el-button>
@@ -49,7 +53,8 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
+    <div style="padding: 30px 0;text-align: center">
     <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -59,36 +64,59 @@
         layout="total, sizes, prev, pager, next"
         :total="total">
     </el-pagination>
+  </div>
 
-    <el-dialog title="添加/修改用户信息" :visible.sync="dialogFormVisible">
+    <el-dialog title="" :visible.sync="dialogFormVisible">
       <el-form>
         <el-form-item label="用户名">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
         <el-form-item label="电话号码">
-          <el-input v-model="form.phone"></el-input>
+          <el-input v-model="form.telephone"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱地址">
+          <el-input v-model="form.email"></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="form.sex" placeholder="请选择">
+            <el-option v-for="item in sexOptions" :key="item.id" :label="item.name" :value="item.name">
+             {{ item.name }}
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="分配角色">
           <el-select v-model="form.role">
             <el-option v-for="item in roles" :key="item.name" :label="item.name" :value="item.roleKey"></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="启用">
+          <el-switch
+              style="display: block;"
+              v-model="form.enabled"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+          >
+          </el-switch>
+        </el-form-item>
+
       </el-form>
       <div slot="footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
       </div>
     </el-dialog>
+
+
   </div>
 </template>
 
 <script>
-``
+import {serverIp} from "../../public/config";
+
 export default {
   name: "User",
   data() {
     return {
-      serverIp: 'http://localhost:9999',
       tableData: [],
       total: 0,
       pageNum: 1,
@@ -99,6 +127,8 @@ export default {
       dialogFormVisible: false,
       multipleSelection: [],
       roles: [],
+      sexOptions:[],
+      serverIp: serverIp,
     }
   },
   created() {
@@ -120,17 +150,32 @@ export default {
       this.request.get("/role").then(res => {
         this.roles = res.data
       })
+      this.request.get("/dict/sex").then(res => {
+        this.sexOptions = res.data
+      })
     },
     save() {
-      this.request.post("/user", this.form).then(res => {
-        if (res.code === 200) {
-          this.$message.success("操作成功!")
-          this.dialogFormVisible = false
-          this.load()
-        } else {
-          this.$message.error(res.msg)
-        }
-       })
+      if (this.form.id != undefined) {
+        this.request.put("/user", this.form).then(res => {
+          if (res.code === 200) {
+            this.$message.success("修改成功!")
+            this.dialogFormVisible = false
+            this.load()
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      } else {
+        this.request.post("/user", this.form).then(res => {
+          if (res.code === 200) {
+            this.$message.success("添加成功!")
+            this.dialogFormVisible = false
+            this.load()
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      }
     },
     add() {
       this.dialogFormVisible = true
@@ -180,7 +225,7 @@ export default {
       this.load()
     },
     excelExport() {
-      window.open('http://localhost:9999/user/export')
+      window.open('http://' + serverIp +':9999/user/export')
     },
     handleExcelImportSuccess() {
       this.$message.success("导入成功")

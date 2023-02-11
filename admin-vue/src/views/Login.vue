@@ -39,18 +39,13 @@ export default {
     login() {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
-          this.request.post("/user/login", this.user).then(res => {
+          this.request.post("/login", this.user).then(res => {
             if (res.code === 200) {
               localStorage.setItem("user", JSON.stringify(res.data))
               localStorage.setItem("menus", JSON.stringify(res.data.menus))
               setRoutes()
-              this.$message.success(res.data.username+"您好")
-              if (res.data.role === 'ROLE_STUDENT') {
-                this.$router.push("/front/home")
-              } else {
-                this.$router.push("/")
-              }
-
+              this.$message.success("登入系统成功!")
+              this.$router.push("/")
             } else {
               this.$message.error(res.msg)
             }
@@ -67,6 +62,7 @@ export default {
 .container {
   height: 100vh;
   overflow: hidden;
+  /*noinspection CssUnknownTarget*/
   background-image: url("../assets/image/background.jpg");
   background-repeat: no-repeat;
   background-size: 100% 100%;

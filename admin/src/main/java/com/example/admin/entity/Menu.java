@@ -12,7 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@TableName("menu")
+@TableName("sys_menu")
 public class Menu implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
@@ -22,7 +22,10 @@ public class Menu implements Serializable {
     private String component;
     private Integer pid;
     private String num;
-    private String time;
+    private String createTime;
+    private String createBy;
+    private String updateTime;
+    private String updateBy;
     @TableField(exist = false)
     private List<Menu> children;
 

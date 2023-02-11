@@ -4,7 +4,7 @@
       <el-form label-width="80px">
         <el-upload
             class="avatar-uploader"
-            :action="'http://127.0.0.1:9999/file/upload'"
+            :action="'http://' + serverIp + ':9999/file/upload'"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
         >
@@ -14,7 +14,17 @@
           <el-input v-model="form.username" disabled ></el-input>
         </el-form-item>
         <el-form-item label="电话号码">
-          <el-input v-model="form.telephone"></el-input>
+          <el-input v-model="form.telephone" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱地址">
+          <el-input v-model="form.email" clearable></el-input>
+        </el-form-item>
+        <el-form-item label="性别">
+          <el-select v-model="form.sex" placeholder="请选择" clearable>
+            <el-option v-for="item in sexOptions" :key="item.id" :label="item.name" :value="item.name">
+              {{ item.name }}
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="save" >点击保存个人信息</el-button>
@@ -22,16 +32,16 @@
       </el-form>
     </el-card>
 
-     <el-card style="width: 300px;margin: 60px; height: 250px;">
+     <el-card style="width: 350px;margin: 60px; height: 250px;">
         <el-form label-width="70px" :model="form"  ref="pass">
           <el-form-item label="原密码" >
-            <el-input v-model="form.password"  show-password></el-input>
+            <el-input v-model="form.password" show-password clearable></el-input>
           </el-form-item>
           <el-form-item label="新密码">
-            <el-input v-model="form.newPassword" show-password></el-input>
+            <el-input v-model="form.newPassword" show-password clearable></el-input>
           </el-form-item>
           <el-form-item label="确认密码">
-            <el-input v-model="form.confirmPassword" show-password></el-input>
+            <el-input v-model="form.confirmPassword" show-password clearable  ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="resetPsw" >修改密码</el-button>
@@ -47,27 +57,24 @@
 
 <script>
 
+import {serverIp} from "../../public/config";
 export default {
   name: "Person",
   data() {
     return {
-      serverIp: 'http://localhost:9999',
-      form: {
-        id:'',
-        username:'',
-        telephone:'',
-        avatar:''
-      },
-      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {}
+      serverIp: serverIp,
+      form:{},
+      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : {},
+      sexOptions:[]
 
     }
   },
   created() {
     this.getUser().then(res => {
-      this.form.id=res.id
-      this.form.username = res.username
-      this.form.telephone=res.telephone
-      this.form.avatar=res.avatar
+      this.form = res
+      this.request.get("/dict/sex").then(res => {
+        this.sexOptions = res.data
+      })
     })
   },
   methods: {
@@ -75,9 +82,9 @@ export default {
       return (await this.request.get("/user/username/" + this.user.username)).data
     },
     save() {
-      this.request.post("/user", this.form).then(res => {
+      this.request.put("/user", this.form).then(res => {
         if (res.code === 200) {
-          this.$message.success("保存成功！")
+          this.$message.success("修改成功！")
 
           // 触发父级更新User的方法
           this.$emit("refreshUser")
@@ -100,7 +107,7 @@ export default {
             this.$message.error("输入的两次新密码不同！")
             return false
           }
-          this.request.post("/user/password", this.form).then(res => {
+          this.request.put("/password", this.form).then(res => {
             if (res.code === 200) {
               this.$message.success("密码修改成功，请重新登录！")
               this.$store.commit("logout")

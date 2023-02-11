@@ -8,7 +8,8 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
-    @Select("select mid from role_menu where rid = #{roleId}")
-    List<Integer> selectMidByRid(@Param("roleId")Integer roleId);
+
+    @Select("select mid from sys_role_menu where rid = #{roleId}")
+    List<Integer> selectMidsByRid(@Param("roleId") Integer roleId);
 
 }

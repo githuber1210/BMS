@@ -30,17 +30,14 @@ export default {
       collapseBtn: 'el-icon-d-arrow-left',
       isCollapse: false,
       sideWidth: 200,
-      user: {}
+      user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : ""
     }
   },
   components: {
     Aside,
     Header
   },
-  created() {
-    // 从后台获取最新的User数据
-    this.getUser()
-  },
+
   methods: {
     collapse() {
       this.isCollapse = !this.isCollapse
@@ -53,7 +50,9 @@ export default {
       }
     },
     getUser() {
-      let username = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")).username : ""
+
+      let user = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : ""
+      this.user = user;
       if (username) {
         // 从后台获取User数据
         this.request.get("/user/username/" + username).then(res => {

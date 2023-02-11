@@ -9,12 +9,18 @@ import java.io.Serializable;
 
 
 
-@TableName("role")
+@TableName("sys_role")
 @Data
 public class Role implements Serializable {
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;
     private String name;
     private String roleKey;
+
+    private String createTime;
+    private String createBy;
+    private String updateTime;
+    private String updateBy;
+    private Integer status;
 
 }

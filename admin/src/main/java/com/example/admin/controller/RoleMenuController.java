@@ -1,27 +1,33 @@
 package com.example.admin.controller;
 
-import com.example.admin.config.Result.Result;
+import com.example.admin.common.Result.Result;
 import com.example.admin.service.IRoleService;
-import org.springframework.stereotype.Controller;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
-
-@Controller
+@Api(tags = "角色-菜单模块")
+@RestController
 @RequestMapping("/roleMenu")
 public class RoleMenuController {
 
-    IRoleService roleService;
+    @Resource
+    private IRoleService roleService;
 
-    @PostMapping("/{roleId}")
-    public Result roleMenu(@PathVariable Integer roleId, @RequestBody List<Integer> menuIds) {
-        roleService.setRoleMenu(roleId, menuIds);
-        return Result.success();
-    }
-
+    @ApiOperation(value = "通过角色ID获取所绑定的菜单")
     @GetMapping("/{roleId}")
     public Result getRoleMenu(@PathVariable Integer roleId) {
-        return Result.success( roleService.getRoleMenu(roleId));
+        List<Integer> roleMenu = roleService.getRoleMenu(roleId);
+        return Result.success(roleMenu);
+    }
+
+    @ApiOperation(value = "修改角色绑定的菜单ID集合")
+    @PostMapping("/{roleId}")
+    public Result setRoleMenu(@PathVariable Integer roleId, @RequestBody List<Integer> menuIds) {
+        roleService.setRoleMenu(roleId, menuIds);
+        return Result.success();
     }
 
 }

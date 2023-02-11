@@ -1,7 +1,10 @@
 <template>
   <div>
-    <el-button icon="el-icon-plus"  @click="add(null)">添加菜单</el-button>
-    <el-table :data="tableData"  stripe row-key="id">
+    <el-button icon="el-icon-plus"  @click="add(null)" >添加菜单</el-button>
+    <el-table :data="tableData"
+              stripe
+              default-expand-all
+              row-key="id">
       <el-table-column prop="name" label="菜单名称"></el-table-column>
       <el-table-column label="图标" width="50">
         <template slot-scope="scope">
@@ -10,11 +13,15 @@
       </el-table-column>
       <el-table-column prop="path" label="路由"></el-table-column>
       <el-table-column prop="component" label="组件名称"></el-table-column>
-      <el-table-column prop="time" label="最后修改时间"></el-table-column>
+      <el-table-column prop="createTime" label="创建时间"></el-table-column>
+      <el-table-column prop="createBy" label="创建人" width="80px"></el-table-column>
+      <el-table-column prop="updateTime" label="最近修改时间"></el-table-column>
+      <el-table-column prop="updateBy" label="最近修改人" width="80px"></el-table-column>
+
       <el-table-column>
         <template slot-scope="scope">
-          <el-button icon="el-icon-plus" @click="add(scope.row.id)" style="margin-left:10px"></el-button>
-          <el-button  icon="el-icon-edit" @click="edit(scope.row)" ></el-button>
+          <el-button icon="el-icon-plus" @click="add(scope.row.id)" circle></el-button>
+          <el-button  icon="el-icon-edit" @click="edit(scope.row)" type="primary" circle ></el-button>
           <el-popconfirm
               style="margin-left:10px"
               confirm-button-text='确定'
@@ -24,13 +31,13 @@
               title="确定删除？"
               @confirm="del(scope.row.id)"
           >
-            <el-button type="danger" slot="reference" icon="el-icon-delete" ></el-button>
+            <el-button type="danger" slot="reference" icon="el-icon-delete" circle ></el-button>
           </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog title="新建/修改菜单" :visible.sync="dialogFormVisible">
+    <el-dialog title="" :visible.sync="dialogFormVisible">
       <el-form>
         <el-form-item label="菜单名称">
           <el-input v-model="form.name"></el-input>
@@ -43,8 +50,8 @@
         </el-form-item>
         <el-form-item label="图标">
           <el-select v-model="form.icon">
-            <el-option v-for="item in icons" :key="item.id" :label="item.iconName" :value="item.iconName">
-              <i :class="item.iconName" />{{ item.iconName }}
+            <el-option v-for="item in icons" :key="item.id" :label="item.name" :value="item.value">
+              <i :class="item.value" />{{ item.name }}
             </el-option>
           </el-select>
         </el-form-item>
@@ -54,6 +61,7 @@
         <el-button type="primary" @click="save">确 定</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -63,10 +71,8 @@ export default {
   data() {
     return {
       tableData: [],
-      name: "",
       form: {},
       dialogFormVisible: false,
-      multipleSelection: [],
       icons: [],
       pid:''
     }
@@ -79,19 +85,34 @@ export default {
       this.request.get("/menu").then(res => {
         this.tableData = res.data
       })
-      this.request.get("/menu/icons").then(res => {
+      this.request.get("/dict/icons").then(res => {
         this.icons = res.data
       })
     },
     save() {
-      this.request.post("/menu", this.form).then(res => {
-        if (res.code === 200) {
-          this.$message.success("保存成功")
-          this.dialogFormVisible = false
-          this.load()
-        }
-      })
+      if (this.form.id != undefined) {
+        this.request.put("/menu", this.form).then(res => {
+          if (res.code === 200) {
+            this.$message.success("修改成功!")
+            this.dialogFormVisible = false
+            this.load()
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      } else {
+        this.request.post("/menu", this.form).then(res => {
+          if (res.code === 200) {
+            this.$message.success("添加成功!")
+            this.dialogFormVisible = false
+            this.load()
+          } else {
+            this.$message.error(res.msg)
+          }
+        })
+      }
     },
+
     add(pid) {
       this.dialogFormVisible = true
       this.form = {}

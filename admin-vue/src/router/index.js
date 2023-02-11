@@ -28,6 +28,13 @@ const router = new VueRouter({
   routes
 })
 
+export const resetRouter = () => {
+  router.matcher = new VueRouter({
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
+  })
+}
 
 export const setRoutes = () => {
   const storeMenus= localStorage.getItem("menus");
@@ -46,9 +53,9 @@ export const setRoutes = () => {
                 name: '个人信息',
                 component: () => import('../views/Person.vue')
               },
-              { path: 'blogDetail',
+              { path: 'noticeDetail',
                 name:'博客详情页',
-                component:()=> import('../views/BlogDetail.vue')
+                component:()=> import('../views/NoticeDetail.vue')
               }
             ] }
       const menus = JSON.parse(storeMenus)
@@ -80,7 +87,6 @@ export const setRoutes = () => {
   }
 }
 
-// 重置就再set一次路由
 setRoutes()
 
 router.beforeEach((to, from, next) => {

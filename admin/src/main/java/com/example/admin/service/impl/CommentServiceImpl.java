@@ -17,7 +17,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     private CommentMapper commentMapper;
 
     @Override
-    public List<Comment> findCommentDetail(Integer BlogId) {
-        return commentMapper.findCommentDetail(BlogId);
+    public List<Comment> findCommentDetail(Integer noticeId) {
+        return commentMapper.findCommentDetail(noticeId);
     }
 }

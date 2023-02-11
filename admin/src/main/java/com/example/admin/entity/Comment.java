@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Data
-@TableName("comment")
+@TableName("sys_notice_comment")
 public class Comment{
     @TableId(value = "id",type = IdType.AUTO)
     private Integer id;

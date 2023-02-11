@@ -6,8 +6,8 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.example.admin.config.Result.ResultCode;
-import com.example.admin.config.exception.ServiceException;
+import com.example.admin.common.Result.ResultCode;
+import com.example.admin.common.exception.ServiceException;
 import com.example.admin.entity.User;
 import com.example.admin.service.IUserService;
 import org.springframework.web.method.HandlerMethod;
@@ -24,13 +24,13 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+
         String token = request.getHeader("token");
 
         // 如果不是映射到方法直接通过
         if(!(handler instanceof HandlerMethod)){
             return true;
         }
-
         if (StrUtil.isBlank(token)) {
             throw new ServiceException(ResultCode.UNAUTHORIZED, "无token，请重新登录");
         }
