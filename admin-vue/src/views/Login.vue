@@ -31,7 +31,7 @@ export default {
         ],
         password: [
           {required: true, message: '请输入密码', trigger: 'blur'},
-          ],
+        ],
       }
     }
   },
@@ -43,6 +43,7 @@ export default {
             if (res.code === 200) {
               localStorage.setItem("user", JSON.stringify(res.data))
               localStorage.setItem("menus", JSON.stringify(res.data.menus))
+              localStorage.setItem("token",JSON.stringify(res.data.token))
               setRoutes()
               this.$message.success("登入系统成功!")
               this.$router.push("/")

@@ -6,8 +6,10 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.example.admin.common.Constants;
 import com.example.admin.common.Result.ResultCode;
 import com.example.admin.common.exception.ServiceException;
+import com.example.admin.config.redis.RedisService;
 import com.example.admin.entity.User;
 import com.example.admin.service.IUserService;
 import org.springframework.web.method.HandlerMethod;
@@ -22,6 +24,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Resource
     private IUserService userService;
 
+    @Resource
+    private RedisService redisService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
@@ -32,6 +37,11 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
         if (StrUtil.isBlank(token)) {
+            throw new ServiceException(ResultCode.UNAUTHORIZED, "无token，请重新登录");
+        }
+
+
+        if (redisService.get(Constants.LOGIN_TOKEN_KEY + token) == null){
             throw new ServiceException(ResultCode.UNAUTHORIZED, "无token，请重新登录");
         }
         // userid验证

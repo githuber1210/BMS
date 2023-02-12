@@ -9,10 +9,9 @@
       <el-table-column prop="os" label="操作系统"></el-table-column>
       <el-table-column prop="loginLocation" label="登录地点"></el-table-column>
       <el-table-column prop="role" label="角色"></el-table-column>
-
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button @click="breakLine(scope.row)" style="color: red" disabled="">下线</el-button>
+          <el-button @click="breakLine(scope.row)" style="color: red">下线</el-button>
         </template>
       </el-table-column>
     </el-table>
