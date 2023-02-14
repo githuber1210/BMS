@@ -12,8 +12,6 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/files/**").addResourceLocations("file:"+System.getProperty("user.dir")+"/files/");
-        registry.addResourceHandler("/druid/**").addResourceLocations("file:"+System.getProperty("user.dir")+"/files/");
-
     }
 
     @Override
